@@ -11,8 +11,9 @@ contract EventTickets {
         Use the appropriate keyword to create an associated getter function.
         Use the appropriate keyword to allow ether transfers.
      */
+    address payable public owner;
 
-    uint   TICKET_PRICE = 100 wei;
+    uint TICKET_PRICE = 100 wei;
 
     /*
         Create a struct called "Event".
@@ -20,6 +21,15 @@ contract EventTickets {
         Choose the appropriate variable type for each field.
         The "buyers" field should keep track of addresses and how many tickets each buyer purchases.
     */
+
+    struct Event {
+        string description;
+        string url;
+        uint totalTickets;
+        uint sales;
+        mapping(address => uint) buyers;
+        bool isOpen;
+    }
 
     Event myEvent;
 
@@ -29,10 +39,17 @@ contract EventTickets {
         LogGetRefund should provide information about the refund requester and the number of tickets refunded.
         LogEndSale should provide infromation about the contract owner and the balance transferred to them.
     */
+    event LogBuyTickets(address buyer, uint tickets);
+    event LogGetRefund (address refundRequester, uint refundedTickets);
+    event LogEndSale (address _owner, uint _sales);
 
     /*
         Create a modifier that throws an error if the msg.sender is not the owner.
     */
+    modifier isOwner{
+        require(owner == msg.sender);
+        _;
+    }
 
     /*
         Define a constructor.
@@ -40,6 +57,13 @@ contract EventTickets {
         Set the owner to the creator of the contract.
         Set the appropriate myEvent details.
     */
+    constructor (string memory _description, string memory _url, uint ticketsForSale) public {
+        owner = msg.sender;
+        myEvent.description = _description;
+        myEvent.url = _url;
+        myEvent.totalTickets = ticketsForSale;
+        myEvent.isOpen = true;
+    }
 
     /*
         Define a function called readEvent() that returns the event details.
